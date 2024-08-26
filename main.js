@@ -1,4 +1,6 @@
+import { DOWN, LEFT, RIGHT, UP } from './src/constants';
 import { GameLoop } from './src/GameLoop';
+import { Input } from './src/Input';
 import { resources } from './src/Resource';
 import { Sprite } from './src/Sprite';
 import { Vector2 } from './src/Vector2';
@@ -32,8 +34,30 @@ const shadowSprite = new Sprite({
 
 const heroPosition = new Vector2(16 * 6, 16 * 5);
 
+const input = new Input();
+
 const update = () => {
     // updating entities in the game;
+    switch (input.direction) {
+        case UP:
+            heroPosition.y -= 1;
+            heroSprite.frame = 6;
+            break;
+        case DOWN:
+            heroPosition.y += 1;
+            heroSprite.frame = 0;
+            break;
+        case LEFT:
+            heroSprite.frame = 9;
+            heroPosition.x -= 1;
+            break;
+        case RIGHT:
+            heroPosition.x += 1;
+            heroSprite.frame = 3;
+            break;    
+        default:
+            break;
+    }
 }
 
 const draw = () => {
