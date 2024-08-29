@@ -1,0 +1,26 @@
+export function moveTowards(person, destinationPosition, speed) {
+    let distanceToTravelX = destinationPosition.x - person.position.x;
+    let distanceToTravelY = destinationPosition.y - person.position.y;
+    
+    let distance = Math.sqrt(distanceToTravelX**2 + distanceToTravelY**2);
+    
+    if (distance <= speed) {
+        // if we're close enough, snap to grid
+        person.position.x = destinationPosition.x;
+        person.position.y = destinationPosition.y;
+    } else {
+        // otherwise, keep moving
+        let normalizedX = distanceToTravelX / distance;
+        let normalizedY = distanceToTravelY / distance;
+        
+        person.position.x += normalizedX * speed;
+        person.position.y += normalizedY * speed;
+    
+        // recalculate distance to travel
+        distanceToTravelX = destinationPosition.x - person.position.x;
+        distanceToTravelY = destinationPosition.y - person.position.y;
+        distance = Math.sqrt(distanceToTravelX**2 + distanceToTravelY**2);
+    }
+
+    return distance;
+}
