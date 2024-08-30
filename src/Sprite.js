@@ -47,15 +47,15 @@ export class Sprite {
         const frameSizeY = this.frameSize.y;
 
         ctx.drawImage(
-            this.resource.image, 
+            this.resource.image,
             frameCoordX, 
-            frameCoordY, 
-            frameSizeX, 
-            frameSizeY, 
-            x, 
-            y, 
-            frameSizeX * this.scale, 
-            frameSizeY * this.scale
-        )
+            frameCoordY, // Top Y corner of frame
+            frameSizeX, // how much to crop from the sprite sheet (X)
+            frameSizeY, // how much to crop from the sprite sheet (Y)
+            x, // Where to place this on canvas tag X (0)
+            y, // Where to place this on canvas tag Y (0)
+            frameSizeX * this.scale, // How large to scale it (X)
+            frameSizeY * this.scale  // How large to scale it (Y)
+        );
     }
 }
