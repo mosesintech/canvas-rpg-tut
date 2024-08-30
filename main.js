@@ -1,9 +1,12 @@
+import { Animations } from './src/Animations';
 import { DOWN, LEFT, RIGHT, UP } from './src/constants';
+import { FrameIndexPattern } from './src/FrameIndexPattern';
 import { GameLoop } from './src/GameLoop';
 import { gridCells, isSpaceFree } from './src/helpers/grid';
 import { moveTowards } from './src/helpers/moveTowards';
 import { Input } from './src/Input';
 import { walls } from './src/levels/level1';
+import { STAND_DOWN, STAND_LEFT, STAND_RIGHT, STAND_UP, WALK_DOWN, WALK_LEFT, WALK_RIGHT, WALK_UP } from './src/objects/Hero/heroAnimations';
 import { resources } from './src/Resource';
 import { Sprite } from './src/Sprite';
 import { Vector2 } from './src/Vector2';
@@ -29,9 +32,20 @@ const heroSprite = new Sprite({
     vFrames: 8,
     frame: 1,
     position: new Vector2(gridCells(6), gridCells(5)),
+    animations: new Animations({
+        standDown: new FrameIndexPattern(STAND_DOWN),
+        standUp: new FrameIndexPattern(STAND_UP),
+        standLeft: new FrameIndexPattern(STAND_LEFT),
+        standRight: new FrameIndexPattern(STAND_RIGHT),
+        walkDown: new FrameIndexPattern(WALK_DOWN),
+        walkUp: new FrameIndexPattern(WALK_UP),
+        walkLeft: new FrameIndexPattern(WALK_LEFT),
+        walkRight: new FrameIndexPattern(WALK_RIGHT),
+    })
 })
 
 const heroDestinationPosition = heroSprite.position.duplicate();
+let heroFacing = DOWN;
 
 const shadowSprite = new Sprite({
     resource: resources.images.shadow,
@@ -40,16 +54,37 @@ const shadowSprite = new Sprite({
 
 const input = new Input();
 
-const update = () => {
+const update = (delta) => {
     // updating entities in the game;
 
     const distance = moveTowards(heroSprite, heroDestinationPosition, 1);
     const hasArrived = distance <= 1;
     if(hasArrived) tryMove();
+
+    // hero animations
+    heroSprite.step(delta);
 }
 
 const tryMove = () => {
-    if(!input.direction) return;
+    if(!input.direction) {
+        switch (heroFacing) {
+            case DOWN:
+               heroSprite.animations.play("standDown"); 
+                break;
+            case UP:
+               heroSprite.animations.play("standUp"); 
+                break;
+            case LEFT:
+               heroSprite.animations.play("standLeft"); 
+                break;
+            case RIGHT:
+               heroSprite.animations.play("standRight"); 
+                break;
+            default:
+                break;
+        }
+        return;
+    };
 
     let nextX = heroDestinationPosition.x;
     let nextY = heroDestinationPosition.y;
@@ -59,23 +94,25 @@ const tryMove = () => {
     switch (input.direction) {
         case UP:
             nextY -= gridSize;
-            heroSprite.frame = 6;
+            heroSprite.animations.play("walkUp");
             break;
         case DOWN:
             nextY += gridSize;
-            heroSprite.frame = 0;
+            heroSprite.animations.play("walkDown");
             break;
         case LEFT:
             nextX -= gridSize;
-            heroSprite.frame = 9;
+            heroSprite.animations.play("walkLeft");
             break;
         case RIGHT:
             nextX += gridSize;
-            heroSprite.frame = 3;
+            heroSprite.animations.play("walkRight");
             break;    
         default:
             break;
     }
+
+    heroFacing = input.direction ?? heroFacing;
 
     if(isSpaceFree(walls, nextX, nextY)) {
         heroDestinationPosition.x = nextX;
